@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { spacing, typography } from '../theme';
 
 export type FilterType = 'all' | 'active' | 'completed';
 
@@ -24,6 +25,8 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
   activeCount,
   completedCount,
 }) => {
+  const { colors } = useTheme();
+
   const tabs: { key: FilterType; label: string; count: number }[] = [
     { key: 'all', label: 'All', count: allCount },
     { key: 'active', label: 'Active', count: activeCount },
@@ -31,20 +34,27 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[
+      styles.container,
+      { 
+        backgroundColor: colors.surface,
+        shadowColor: colors.shadow,
+      },
+    ]}>
       {tabs.map((tab) => (
         <TouchableOpacity
           key={tab.key}
           style={[
             styles.tab,
-            activeFilter === tab.key && styles.activeTab,
+            activeFilter === tab.key && { backgroundColor: colors.primary },
           ]}
           onPress={() => onFilterChange(tab.key)}
         >
           <Text
             style={[
               styles.tabText,
-              activeFilter === tab.key && styles.activeTabText,
+              { color: colors.textSecondary },
+              activeFilter === tab.key && { color: colors.textInverse },
             ]}
           >
             {tab.label}
@@ -52,13 +62,15 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
           <View
             style={[
               styles.badge,
-              activeFilter === tab.key && styles.activeBadge,
+              { backgroundColor: colors.surfaceSecondary },
+              activeFilter === tab.key && { backgroundColor: 'rgba(255, 255, 255, 0.3)' },
             ]}
           >
             <Text
               style={[
                 styles.badgeText,
-                activeFilter === tab.key && styles.activeBadgeText,
+                { color: colors.textSecondary },
+                activeFilter === tab.key && { color: colors.textInverse },
               ]}
             >
               {tab.count}
@@ -73,11 +85,9 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: colors.white,
     borderRadius: 12,
     padding: spacing.xs,
     marginBottom: spacing.lg,
-    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -93,35 +103,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     gap: spacing.xs,
   },
-  activeTab: {
-    backgroundColor: colors.primary,
-  },
   tabText: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.semibold,
-    color: colors.textSecondary,
-  },
-  activeTabText: {
-    color: colors.white,
   },
   badge: {
-    backgroundColor: colors.gray200,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: 10,
     minWidth: 24,
     alignItems: 'center',
   },
-  activeBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-  },
   badgeText: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textSecondary,
-  },
-  activeBadgeText: {
-    color: colors.white,
   },
 });
 

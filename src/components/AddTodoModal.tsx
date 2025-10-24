@@ -14,9 +14,10 @@ import {
   Platform,
 } from 'react-native';
 import { Todo, TodoPriority, TodoStatus, CreateTodoInput } from '../types/Todo';
+import { useTheme } from '../contexts/ThemeContext';
 import { Input } from './Input';
 import { Button } from './Button';
-import { colors, spacing, typography } from '../theme';
+import { spacing, typography } from '../theme';
 
 interface AddTodoModalProps {
   visible: boolean;
@@ -31,6 +32,7 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({
   onSave,
   editTodo,
 }) => {
+  const { colors } = useTheme();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<TodoPriority>(TodoPriority.MEDIUM);
@@ -92,6 +94,17 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({
     onClose();
   };
 
+  const getPriorityColor = (priority: TodoPriority) => {
+    switch (priority) {
+      case TodoPriority.HIGH:
+        return colors.priorityHigh;
+      case TodoPriority.MEDIUM:
+        return colors.priorityMedium;
+      case TodoPriority.LOW:
+        return colors.priorityLow;
+    }
+  };
+
   return (
     <Modal
       visible={visible}
@@ -100,16 +113,16 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({
       onRequestClose={handleClose}
     >
       <KeyboardAvoidingView
-        style={styles.overlay}
+        style={[styles.overlay, { backgroundColor: colors.overlay }]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>
+        <View style={[styles.container, { backgroundColor: colors.surface }]}>
+          <View style={[styles.header, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>
               {editTodo ? 'Edit Todo' : 'Add New Todo'}
             </Text>
             <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-              <Text style={styles.closeIcon}>✕</Text>
+              <Text style={[styles.closeIcon, { color: colors.textSecondary }]}>✕</Text>
             </TouchableOpacity>
           </View>
 
@@ -133,24 +146,26 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({
               style={styles.textArea}
             />
 
-            <Text style={styles.label}>Priority</Text>
+            <Text style={[styles.label, { color: colors.textPrimary }]}>Priority</Text>
             <View style={styles.priorityContainer}>
               {Object.values(TodoPriority).map((p) => (
                 <TouchableOpacity
                   key={p}
                   style={[
                     styles.priorityButton,
-                    priority === p && styles.priorityButtonActive,
-                    { borderColor: getPriorityColor(p) },
-                    priority === p && { backgroundColor: getPriorityColor(p) },
+                    { 
+                      borderColor: getPriorityColor(p),
+                      backgroundColor: priority === p ? getPriorityColor(p) : 'transparent',
+                    },
                   ]}
                   onPress={() => setPriority(p)}
                 >
                   <Text
                     style={[
                       styles.priorityButtonText,
-                      priority === p && styles.priorityButtonTextActive,
-                      { color: priority === p ? colors.white : getPriorityColor(p) },
+                      { 
+                        color: priority === p ? colors.textInverse : getPriorityColor(p),
+                      },
                     ]}
                   >
                     {p.toUpperCase()}
@@ -160,7 +175,7 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({
             </View>
           </ScrollView>
 
-          <View style={styles.footer}>
+          <View style={[styles.footer, { borderTopColor: colors.border }]}>
             <Button
               title="Cancel"
               onPress={handleClose}
@@ -180,25 +195,12 @@ export const AddTodoModal: React.FC<AddTodoModalProps> = ({
   );
 };
 
-const getPriorityColor = (priority: TodoPriority) => {
-  switch (priority) {
-    case TodoPriority.HIGH:
-      return colors.priorityHigh;
-    case TodoPriority.MEDIUM:
-      return colors.priorityMedium;
-    case TodoPriority.LOW:
-      return colors.priorityLow;
-  }
-};
-
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: colors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '90%',
@@ -209,19 +211,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.gray200,
   },
   title: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.xs,
   },
   closeIcon: {
     fontSize: typography.fontSize.xl,
-    color: colors.textSecondary,
   },
   content: {
     padding: spacing.lg,
@@ -229,7 +228,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.medium,
-    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   textArea: {
@@ -248,22 +246,15 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     alignItems: 'center',
   },
-  priorityButtonActive: {
-    borderWidth: 2,
-  },
   priorityButtonText: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.semibold,
-  },
-  priorityButtonTextActive: {
-    color: colors.white,
   },
   footer: {
     flexDirection: 'row',
     padding: spacing.lg,
     gap: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: colors.gray200,
   },
   footerButton: {
     flex: 1,

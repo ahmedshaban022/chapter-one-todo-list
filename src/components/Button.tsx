@@ -12,7 +12,8 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { spacing, typography } from '../theme';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'success';
 type ButtonSize = 'small' | 'medium' | 'large';
@@ -36,14 +37,47 @@ export const Button: React.FC<ButtonProps> = ({
   loading = false,
   style,
 }) => {
+  const { colors } = useTheme();
   const isDisabled = disabled || loading;
+
+  const getButtonStyle = () => {
+    const baseStyle = [styles.button, styles[`${size}Button`]];
+    
+    switch (variant) {
+      case 'primary':
+        return [...baseStyle, { backgroundColor: colors.primary }];
+      case 'secondary':
+        return [...baseStyle, { backgroundColor: colors.secondary }];
+      case 'outline':
+        return [...baseStyle, { 
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderColor: colors.primary,
+        }];
+      case 'danger':
+        return [...baseStyle, { backgroundColor: colors.error }];
+      case 'success':
+        return [...baseStyle, { backgroundColor: colors.success }];
+      default:
+        return [...baseStyle, { backgroundColor: colors.primary }];
+    }
+  };
+
+  const getTextStyle = () => {
+    const baseStyle = [styles.text, styles[`${size}Text`]];
+    
+    switch (variant) {
+      case 'outline':
+        return [...baseStyle, { color: colors.primary }];
+      default:
+        return [...baseStyle, { color: colors.textInverse }];
+    }
+  };
 
   return (
     <TouchableOpacity
       style={[
-        styles.button,
-        styles[`${variant}Button`],
-        styles[`${size}Button`],
+        ...getButtonStyle(),
         isDisabled && styles.disabledButton,
         style,
       ]}
@@ -53,15 +87,13 @@ export const Button: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'outline' ? colors.primary : colors.white}
+          color={variant === 'outline' ? colors.primary : colors.textInverse}
           size="small"
         />
       ) : (
         <Text
           style={[
-            styles.text,
-            styles[`${variant}Text`],
-            styles[`${size}Text`],
+            ...getTextStyle(),
             isDisabled && styles.disabledText,
           ]}
         >
@@ -78,25 +110,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-  },
-  
-  // Variants
-  primaryButton: {
-    backgroundColor: colors.primary,
-  },
-  secondaryButton: {
-    backgroundColor: colors.secondary,
-  },
-  outlineButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  dangerButton: {
-    backgroundColor: colors.error,
-  },
-  successButton: {
-    backgroundColor: colors.success,
   },
   
   // Sizes
@@ -121,21 +134,6 @@ const styles = StyleSheet.create({
   // Text styles
   text: {
     fontWeight: typography.fontWeight.semibold,
-  },
-  primaryText: {
-    color: colors.white,
-  },
-  secondaryText: {
-    color: colors.white,
-  },
-  outlineText: {
-    color: colors.primary,
-  },
-  dangerText: {
-    color: colors.white,
-  },
-  successText: {
-    color: colors.white,
   },
   smallText: {
     fontSize: typography.fontSize.sm,

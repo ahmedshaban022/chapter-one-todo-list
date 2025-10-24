@@ -11,7 +11,8 @@ import {
   TextInputProps,
   ViewStyle,
 } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { spacing, typography } from '../theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -26,19 +27,25 @@ export const Input: React.FC<InputProps> = ({
   style,
   ...props
 }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={[styles.label, { color: colors.textPrimary }]}>{label}</Text>}
       <TextInput
         style={[
           styles.input,
-          error && styles.inputError,
+          { 
+            backgroundColor: colors.surface,
+            borderColor: error ? colors.error : colors.border,
+            color: colors.textPrimary,
+          },
           style,
         ]}
-        placeholderTextColor={colors.gray400}
+        placeholderTextColor={colors.textLight}
         {...props}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>}
     </View>
   );
 };
@@ -50,25 +57,17 @@ const styles = StyleSheet.create({
   label: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.medium,
-    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   input: {
-    backgroundColor: colors.white,
     borderWidth: 1,
-    borderColor: colors.gray300,
     borderRadius: 8,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     fontSize: typography.fontSize.md,
-    color: colors.textPrimary,
-  },
-  inputError: {
-    borderColor: colors.error,
   },
   errorText: {
     fontSize: typography.fontSize.sm,
-    color: colors.error,
     marginTop: spacing.xs,
   },
 });

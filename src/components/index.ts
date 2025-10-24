@@ -9,4 +9,5 @@ export { TodoItem } from './TodoItem';
 export { EmptyState } from './EmptyState';
 export { AddTodoModal } from './AddTodoModal';
 export { FilterTabs, type FilterType } from './FilterTabs';
+export { ThemeToggle } from './ThemeToggle';
 

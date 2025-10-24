@@ -11,6 +11,7 @@ A modern, feature-rich Todo List application built with React Native, TypeScript
 
 - ✅ **Create, Read, Update, Delete (CRUD)** todos
 - 🎨 **Beautiful, Modern UI/UX** with smooth animations
+- 🌙 **Dark & Light Mode** - Toggle between themes with persistent preference
 - 📱 **Cross-platform** - Works on iOS and Android
 - 💾 **Persistent Storage** - AsyncStorage keeps your todos saved
 - 🎯 **Priority Levels** - High, Medium, Low priorities with color coding
@@ -43,8 +44,11 @@ chapter-one-todo-list/
 │   │   ├── EmptyState.tsx
 │   │   ├── FilterTabs.tsx
 │   │   ├── Input.tsx
+│   │   ├── ThemeToggle.tsx
 │   │   ├── TodoItem.tsx
 │   │   └── index.ts
+│   ├── contexts/            # React contexts
+│   │   └── ThemeContext.tsx
 │   ├── hooks/               # Custom React hooks
 │   │   └── useTodos.ts
 │   ├── services/            # Business logic & storage
@@ -55,11 +59,14 @@ chapter-one-todo-list/
 │   │   └── TodoRepository.ts
 │   ├── theme/               # Design tokens
 │   │   ├── colors.ts
+│   │   ├── darkColors.ts
+│   │   ├── lightColors.ts
 │   │   ├── spacing.ts
 │   │   ├── typography.ts
 │   │   └── index.ts
 │   └── types/               # TypeScript types
-│       └── Todo.ts
+│       ├── Todo.ts
+│       └── Theme.ts
 ├── App.tsx                  # Main application component
 ├── index.ts                 # Application entry point
 ├── package.json
@@ -227,6 +234,12 @@ For more details, check out [Expo EAS Build Documentation](https://docs.expo.dev
 1. Tap **"Clear All"** in the header (visible when todos exist)
 2. Confirm the action
 
+### Switching Themes
+
+1. Tap the **theme toggle button** (🌙/☀️) in the header
+2. The app will instantly switch between light and dark modes
+3. Your theme preference is automatically saved
+
 ## 🛠️ Technologies Used
 
 - **[React Native](https://reactnative.dev/)** - Mobile framework
@@ -234,6 +247,7 @@ For more details, check out [Expo EAS Build Documentation](https://docs.expo.dev
 - **[Expo](https://expo.dev/)** - Development platform
 - **[AsyncStorage](https://react-native-async-storage.github.io/async-storage/)** - Persistent storage
 - **[React Hooks](https://reactjs.org/docs/hooks-intro.html)** - State management
+- **[React Context](https://reactjs.org/docs/context.html)** - Theme management
 
 ## 📝 Key Features Explained
 
@@ -256,6 +270,14 @@ Todos are color-coded by priority:
 Todos are automatically sorted by:
 1. **Priority** (High → Medium → Low)
 2. **Creation Date** (Newest first within same priority)
+
+### Dark & Light Mode
+
+The app supports both dark and light themes:
+- **Theme Toggle**: Tap the 🌙/☀️ button in the header
+- **Persistent Preference**: Your theme choice is saved automatically
+- **System Integration**: Status bar adapts to the current theme
+- **Smooth Transitions**: Instant theme switching with no flicker
 
 ## 🧪 Development Scripts
 

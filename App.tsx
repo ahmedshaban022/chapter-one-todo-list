@@ -1,6 +1,6 @@
 /**
  * Main App Component
- * Todo List Application with persistent storage
+ * Todo List Application with persistent storage and dark/light mode
  * Built with TypeScript and following SOLID principles
  */
 
@@ -20,6 +20,7 @@ import { Todo, CreateTodoInput, UpdateTodoInput } from './src/types/Todo';
 import { TodoRepository } from './src/services/TodoRepository';
 import { AsyncStorageService } from './src/services/AsyncStorageService';
 import { useTodos } from './src/hooks/useTodos';
+import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import {
   TodoItem,
   EmptyState,
@@ -27,14 +28,16 @@ import {
   FilterTabs,
   FilterType,
   Button,
+  ThemeToggle,
 } from './src/components';
-import { colors, spacing, typography } from './src/theme';
+import { spacing, typography } from './src/theme';
 
 // Initialize services following Dependency Injection principle
 const storageService = new AsyncStorageService<Todo[]>();
 const todoRepository = new TodoRepository(storageService);
 
-export default function App() {
+const AppContent: React.FC = () => {
+  const { colors, themeMode } = useTheme();
   const {
     todos,
     activeTodos,
@@ -115,16 +118,22 @@ export default function App() {
   const renderHeader = () => (
     <View style={styles.header}>
       <View>
-        <Text style={styles.title}>My Tasks</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>My Tasks</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           {activeTodos.length} active {activeTodos.length === 1 ? 'task' : 'tasks'}
         </Text>
       </View>
-      {todos.length > 0 && (
-        <TouchableOpacity onPress={handleDeleteAll} style={styles.deleteAllButton}>
-          <Text style={styles.deleteAllText}>Clear All</Text>
-        </TouchableOpacity>
-      )}
+      <View style={styles.headerActions}>
+        <ThemeToggle style={styles.themeToggle} />
+        {todos.length > 0 && (
+          <TouchableOpacity 
+            onPress={handleDeleteAll} 
+            style={[styles.deleteAllButton, { backgroundColor: colors.error + '15' }]}
+          >
+            <Text style={[styles.deleteAllText, { color: colors.error }]}>Clear All</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 
@@ -155,11 +164,11 @@ export default function App() {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>⚠️</Text>
-          <Text style={styles.errorTitle}>Something went wrong</Text>
-          <Text style={styles.errorMessage}>{error}</Text>
+          <Text style={[styles.errorTitle, { color: colors.textPrimary }]}>Something went wrong</Text>
+          <Text style={[styles.errorMessage, { color: colors.textSecondary }]}>{error}</Text>
           <Button title="Try Again" onPress={refreshTodos} style={styles.retryButton} />
         </View>
       </SafeAreaView>
@@ -167,8 +176,8 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style={themeMode === 'dark' ? 'light' : 'dark'} />
 
       {renderHeader()}
 
@@ -207,7 +216,10 @@ export default function App() {
         />
       </View>
 
-      <TouchableOpacity style={styles.fab} onPress={handleAddTodo}>
+      <TouchableOpacity 
+        style={[styles.fab, { backgroundColor: colors.primary, shadowColor: colors.shadow }]} 
+        onPress={handleAddTodo}
+      >
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
 
@@ -219,12 +231,19 @@ export default function App() {
       />
     </SafeAreaView>
   );
+};
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -237,23 +256,27 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.fontSize.xxxl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
   },
   subtitle: {
     fontSize: typography.fontSize.md,
-    color: colors.textSecondary,
     marginTop: spacing.xs,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  themeToggle: {
+    marginRight: spacing.sm,
   },
   deleteAllButton: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: 8,
-    backgroundColor: colors.error + '15',
   },
   deleteAllText: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.semibold,
-    color: colors.error,
   },
   content: {
     flex: 1,
@@ -272,10 +295,8 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -283,7 +304,7 @@ const styles = StyleSheet.create({
   },
   fabIcon: {
     fontSize: 32,
-    color: colors.white,
+    color: '#FFFFFF',
     fontWeight: typography.fontWeight.bold,
   },
   errorContainer: {
@@ -299,12 +320,10 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   errorMessage: {
     fontSize: typography.fontSize.md,
-    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.lg,
   },

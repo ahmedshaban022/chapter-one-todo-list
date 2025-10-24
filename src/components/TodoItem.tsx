@@ -12,7 +12,8 @@ import {
   Alert,
 } from 'react-native';
 import { Todo, TodoStatus, TodoPriority } from '../types/Todo';
-import { colors, spacing, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { spacing, typography } from '../theme';
 
 interface TodoItemProps {
   todo: Todo;
@@ -27,6 +28,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   onDelete,
   onEdit,
 }) => {
+  const { colors } = useTheme();
   const isCompleted = todo.status === TodoStatus.COMPLETED;
 
   const handleDelete = () => {
@@ -65,7 +67,14 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   return (
-    <View style={[styles.container, isCompleted && styles.completedContainer]}>
+    <View style={[
+      styles.container,
+      { 
+        backgroundColor: colors.surface,
+        shadowColor: colors.shadow,
+      },
+      isCompleted && styles.completedContainer,
+    ]}>
       {/* Priority Indicator */}
       <View
         style={[
@@ -81,7 +90,11 @@ export const TodoItem: React.FC<TodoItemProps> = ({
         <View
           style={[
             styles.checkbox,
-            isCompleted && styles.checkboxCompleted,
+            { borderColor: colors.border },
+            isCompleted && { 
+              backgroundColor: colors.success,
+              borderColor: colors.success,
+            },
           ]}
         >
           {isCompleted && <Text style={styles.checkmark}>✓</Text>}
@@ -92,6 +105,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
         <Text
           style={[
             styles.title,
+            { color: colors.textPrimary },
             isCompleted && styles.completedTitle,
           ]}
           numberOfLines={2}
@@ -103,7 +117,8 @@ export const TodoItem: React.FC<TodoItemProps> = ({
           <Text
             style={[
               styles.description,
-              isCompleted && styles.completedText,
+              { color: colors.textSecondary },
+              isCompleted && { color: colors.textLight },
             ]}
             numberOfLines={2}
           >
@@ -130,7 +145,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
             </View>
           </View>
 
-          <Text style={styles.dateText}>
+          <Text style={[styles.dateText, { color: colors.textLight }]}>
             {formatDate(todo.createdAt)}
           </Text>
         </View>
@@ -158,11 +173,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: colors.white,
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.md,
-    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -184,16 +197,11 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: colors.gray400,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkboxCompleted: {
-    backgroundColor: colors.success,
-    borderColor: colors.success,
-  },
   checkmark: {
-    color: colors.white,
+    color: '#FFFFFF',
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
   },
@@ -204,20 +212,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.semibold,
-    color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   completedTitle: {
     textDecorationLine: 'line-through',
-    color: colors.textSecondary,
   },
   description: {
     fontSize: typography.fontSize.sm,
-    color: colors.textSecondary,
     marginBottom: spacing.sm,
-  },
-  completedText: {
-    color: colors.textLight,
   },
   footer: {
     flexDirection: 'row',
@@ -238,7 +240,6 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: typography.fontSize.xs,
-    color: colors.textLight,
   },
   actions: {
     justifyContent: 'space-between',
