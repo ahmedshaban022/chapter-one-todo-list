@@ -1,14 +1,20 @@
 {
   "name": "chapter-one-todo-list",
   "version": "1.0.0",
+  "description": "A modern, feature-rich Todo List app with persistent storage built with React Native, TypeScript, and following SOLID principles",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
+    "start:clear": "expo start --clear",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build:ios": "eas build --platform ios",
+    "build:android": "eas build --platform android",
+    "build:all": "eas build --platform all"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "expo": "~54.0.20",
     "expo-status-bar": "~3.0.8",
     "react": "19.1.0",
@@ -18,5 +24,21 @@
     "@types/react": "~19.1.0",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "keywords": [
+    "react-native",
+    "typescript",
+    "expo",
+    "todo-list",
+    "todo-app",
+    "mobile-app",
+    "solid-principles",
+    "asyncstorage"
+  ],
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
 }
